@@ -53,7 +53,7 @@ class ActiveRecordArchiver
   end
   
   def self.assert_instance_of instance, klass
-    if instance.class != klass
+    unless instance.class <= klass
       raise "Object #{instance} is not an instance of the #{klass} model"
     end
   end
