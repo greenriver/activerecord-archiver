@@ -55,14 +55,22 @@ class ActiveRecordArchiver
         
         rec = {}
         attributes.each do |attribute|
+          attribute, placeholder = if attribute.is_a? Array
+                                   then attribute
+                                   else [attribute, nil] end
           
           if has_attribute? model, attribute
             # store attribute
-            rec[attribute] = record.send attribute
+            rec[attribute] = if placeholder.nil?
+                             then record.send attribute
+                             else placeholder end
           elsif belongs_to?(model, attribute)
             # store relation
             if (index = relation_index(record, attribute))
               rec[attribute] = index
+              if placeholder
+                rec[relation_foreign_key(model, attribute)] = placeholder
+              end
             else
               raise "#{record} belongs_to #{attribute} which is not included in the export"
             end

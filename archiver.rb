@@ -7,6 +7,10 @@ class ActiveRecordArchiver
     model.reflections.with_indifferent_access[attribute]
   end
   
+  def self.relation_model model, attribute
+    relation(model, attribute).class_name.constantize
+  end
+  
   def self.belongs_to? model, attribute
     !!relation(model, attribute).try(:belongs_to?)
   end
@@ -15,9 +19,12 @@ class ActiveRecordArchiver
     model.columns_hash.with_indifferent_access[attribute]
   end
   
+  def self.column_required model, attribute
+    column(model, attribute).null == false
+  end
+  
   def self.relation_index record, attribute
-    relation_model = relation(record.class, attribute).class_name.constantize
-    relevant_records = @models_hash[relation_model].first
+    relevant_records = @models_hash[relation_model(record.class, attribute)].first
     relevant_records.present? && relevant_records.index(record.send(attribute))
   end
   
@@ -35,7 +42,12 @@ class ActiveRecordArchiver
     hash.each_pair do |key, value|
       if column(model, key)
         ret[column(model, key)] = value
-      elsif !belongs_to?(model, key)
+      elsif belongs_to?(model, key)
+        foreign_key = relation_foreign_key(model, key)
+        if !hash.include?(foreign_key) and column_required(model, foreign_key)
+          ret[column(model, foreign_key)] = relation_model(model, key).first.id
+        end
+      else
         raise "#{attribute} is not an attribute or belongs_to relation of #{model}"
       end
     end
