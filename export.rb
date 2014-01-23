@@ -35,13 +35,17 @@ Example:
 
 =end
 
+require_relative 'archiver'
+
 class ActiveRecordArchiver
   def self.export models_hash
+    
+    @models_hash = models_hash
     
     result = {}
     
     # serialize
-    models_hash.each_pair do |model, pair|
+    @models_hash.each_pair do |model, pair|
       records, attributes = pair
       
       result[model.to_s] = []
@@ -49,19 +53,15 @@ class ActiveRecordArchiver
         
         assert_instance_of record, model
         
-        attrs = record.attributes.with_indifferent_access
-        relations = model.reflections.with_indifferent_access
         rec = {}
         attributes.each do |attribute|
           
-          if attrs[attribute]
+          if has_attribute? model, attribute
             # store attribute
-            rec[attribute] = attrs[attribute]
-          elsif relations[attribute].try(:belongs_to?)
+            rec[attribute] = record.send attribute
+          elsif belongs_to?(model, attribute)
             # store relation
-            relevant_records = models_hash[relations[attribute].class_name.constantize].first
-            index = relevant_records.present? && relevant_records.index(record.send(attribute))
-            if index
+            if (index = relation_index(record, attribute))
               rec[attribute] = index
             else
               raise "#{record} belongs_to #{attribute} which is not included in the export"
@@ -76,13 +76,5 @@ class ActiveRecordArchiver
     
     # encode
     JSON.dump result
-  end
-  
-  private
-  
-  def self.assert_instance_of instance, klass
-    if instance.class != klass
-      raise "Object #{instance} is not an instance of the #{klass} model"
-    end
   end
 end

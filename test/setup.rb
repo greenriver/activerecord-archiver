@@ -5,3 +5,4 @@ require 'sqlite3'
 ActiveRecord::Base.establish_connection(:adapter  => 'sqlite3',
                                         :database => 'test.db')
 require_relative '../export'
+require_relative '../import'
