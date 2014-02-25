@@ -48,7 +48,7 @@ class ActiveRecordArchiver
           ret[column(model, foreign_key)] = relation_model(model, key).first.id
         end
       else
-        raise "#{attribute} is not an attribute or belongs_to relation of #{model}"
+        raise "#{key} is not an attribute or belongs_to relation of #{model}"
       end
     end
     ret
