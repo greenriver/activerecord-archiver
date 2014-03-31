@@ -76,4 +76,25 @@ class ActiveRecordArchiver
       raise "#{model} is not an activerecord model"
     end
   end
+  
+  def self.relation_from_key model, attribute
+    model.reflections.values.detect{|ref| ref.foreign_key == attribute}
+  end
+  
+  def self.cols_for_model model, all_models
+    model.columns.map do |col|
+      if col.primary
+        # omit primary keys
+        nil
+      elsif (relation = relation_from_key(model, col.name))
+        # include belongs_to relations to included models
+        if all_models.include? relation.klass
+          relation.name
+        else nil end
+      else
+        warn "Warning: #{model}##{col.name} included in export" if col.name =~ /_id$/
+        col.name
+      end
+    end.compact
+  end
 end

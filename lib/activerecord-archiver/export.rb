@@ -36,9 +36,9 @@ Example:
 =end
 
 class ActiveRecordArchiver
-  def self.export models_hash
+  def self.export *args
     
-    @models_hash = models_hash
+    @models_hash = models_hash_from_args(args)
     
     result = {}
     
@@ -69,8 +69,6 @@ class ActiveRecordArchiver
               if placeholder
                 rec[relation_foreign_key(model, attribute)] = placeholder
               end
-            else
-              raise "#{record} belongs_to #{attribute} which is not included in the export"
             end
           else
             raise "#{attribute} is not an attribute or belongs_to relation of #{model}"
@@ -82,5 +80,28 @@ class ActiveRecordArchiver
     
     # encode
     JSON.dump result
+  end
+  
+  def self.models_hash_from_args args
+    options = args.extract_options!
+    args.each do |arg|
+      options[arg] = :all
+    end
+    
+    models = options.each_pair.map do |collection, _|
+      collection.first.class
+    end
+    
+    models_hash = {}
+    
+    options.each_pair do |collection, cols|
+      models_hash[collection.first.class] =
+        [collection,
+         if cols == :all
+           cols_for_model(collection.first.class, models)
+         else cols end]
+    end
+    
+    models_hash
   end
 end

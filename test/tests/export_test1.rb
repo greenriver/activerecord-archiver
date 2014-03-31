@@ -12,7 +12,7 @@ class ExportTest1 < NodeWrapper
   end
   
   def json
-    @json ||= ActiveRecordArchiver.export Node => [@nodes, [:name, :next]]
+    @json ||= ActiveRecordArchiver.export @nodes
   end
   
   def expected
