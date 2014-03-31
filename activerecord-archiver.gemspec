@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'activerecord-archiver'
-  s.version     = '0.1.0'
+  s.version     = '0.1.1'
   s.date        = '2014-02-05'
   s.summary     = "A simle tool for exporting/importing subsets of activerecord tables as JSON."
   s.description = <<DESC
