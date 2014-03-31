@@ -14,8 +14,6 @@ Effects:
 
 =end
 
-require_relative 'archiver'
-
 class ActiveRecordArchiver
   def self.import json
     

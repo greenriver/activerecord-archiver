@@ -35,8 +35,6 @@ Example:
 
 =end
 
-require_relative 'archiver'
-
 class ActiveRecordArchiver
   def self.export models_hash
     

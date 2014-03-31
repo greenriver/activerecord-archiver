@@ -45,6 +45,7 @@ class ActiveRecordArchiver
       elsif belongs_to?(model, key)
         foreign_key = relation_foreign_key(model, key)
         if !hash.include?(foreign_key) and column_required(model, foreign_key)
+          # if the foreign key is required connect it to the first available record temporarily
           ret[column(model, foreign_key)] = relation_model(model, key).first.id
         end
       else
