@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'activerecord-archiver'
-  s.version     = '0.1.1'
+  s.version     = '0.1.3'
   s.date        = '2014-02-05'
   s.summary     = "A simle tool for exporting/importing subsets of activerecord tables as JSON."
   s.description = <<DESC
@@ -23,4 +23,5 @@ DESC
   s.add_runtime_dependency 'activerecord', '>= 3.2'
   s.add_runtime_dependency 'activesupport', '>= 3.2'
   s.add_development_dependency 'sqlite3'
+  s.add_development_dependency 'pry'
 end

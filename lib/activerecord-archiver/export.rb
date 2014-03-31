@@ -88,9 +88,9 @@ class ActiveRecordArchiver
       options[arg] = :all
     end
     
-    options.each_pair do |collection, cols|
+    options.keys.each do |collection|
       if collection.is_a? ActiveRecord::Base
-        options[[collection]] = cols
+        options[[collection]] = options[collection]
         options.delete(collection)
       end
     end
