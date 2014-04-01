@@ -104,9 +104,12 @@ class ActiveRecordArchiver
     options.each_pair do |collection, cols|
       models_hash[collection.first.class] =
         [collection,
-         if cols == :all
-           cols_for_model(collection.first.class, models)
-         else cols end]
+         if cols.is_a? Array then cols
+         elsif cols == :all or cols.is_a? Hash
+           cols_for_model(collection.first.class, models, cols)
+         else
+           raise "unknown column specification: #{cols}"
+         end]
     end
     
     models_hash

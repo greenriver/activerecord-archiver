@@ -25,7 +25,7 @@ class ActiveRecordArchiver
   
   def self.relation_index record, attribute
     relevant_records = @models_hash[relation_model(record.class, attribute)].first
-    relevant_records.present? && relevant_records.index(record.send(attribute))
+    relevant_records.present? && relevant_records.map(&:id).index(record.send(attribute).id)
   end
   
   def self.relation_id model, key, value
@@ -81,18 +81,35 @@ class ActiveRecordArchiver
     model.reflections.values.detect{|ref| ref.foreign_key == attribute}
   end
   
-  def self.cols_for_model model, all_models
+  def self.parse_array_option options, key
+    if options.is_a? Hash
+      case options[key]
+      when Array then options[key].map(&:to_s)
+      when nil then []
+      else [options[key].to_s] end
+    else [] end
+  end
+  
+  def self.id_warning model, col
+    "Warning: #{model}##{col.name} included in export." +
+      "  To exclude it use ActiveRecordArchiver.export(#{model.name.downcase.pluralize} => " +
+      "{:exclude => [:#{col.name}]})"
+  end
+  
+  def self.cols_for_model model, all_models, options={}
     model.columns.map do |col|
-      if col.primary
-        # omit primary keys
+      if (col.primary or
+          parse_array_option(options, :exclude).include? col.name)
+        # omit primary keys and excluded columns
         nil
-      elsif (relation = relation_from_key(model, col.name))
+      elsif (relation = relation_from_key(model, col.name)) and relation.belongs_to?
         # include belongs_to relations to included models
         if all_models.include? relation.klass
           relation.name
         else nil end
       else
-        warn "Warning: #{model}##{col.name} included in export" if col.name =~ /_id$/
+        # warn before adding an attribute ending in '_id'
+        warn id_warning(model, col) if col.name =~ /_id$/
         col.name
       end
     end.compact
