@@ -108,7 +108,7 @@ class ActiveRecordArchiver
         nil
       elsif (relation = relation_from_key(model, col.name)) and relation.belongs_to?
         # include belongs_to relations to included models
-        if all_models.any?{|m| m <= relation.klass}
+        if all_models.include? relation.klass
           relation.name
         else nil end
       else

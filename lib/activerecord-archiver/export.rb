@@ -96,13 +96,13 @@ class ActiveRecordArchiver
     end
     
     models = options.each_pair.map do |collection, _|
-      collection.first.class
+      collection.first.class.base_class
     end
     
     models_hash = {}
     
     options.each_pair do |collection, cols|
-      models_hash[collection.first.class] =
+      models_hash[collection.first.class.base_class] =
         [collection,
          if cols.is_a? Array then cols
          elsif cols == :all or cols.is_a? Hash
