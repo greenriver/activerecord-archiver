@@ -38,8 +38,7 @@ class ActiveRecordArchiver
         
         records.each do |record|
           if (update_hash = relations_update_hash(model, record))
-            instance = model.find(record[:id])
-            instance.update update_hash
+            model.where(:id => record[:id]).update_all(update_hash)
           end
         end
       end
