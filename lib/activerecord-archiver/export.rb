@@ -46,7 +46,7 @@ class ActiveRecordArchiver
     @models_hash.each_pair do |model, (records, attributes)|
       next unless records.present?
       result[model.to_s] = []
-      records.each do |record|
+      [*records].each do |record|
         
         assert_instance_of record, model
         
@@ -91,10 +91,12 @@ class ActiveRecordArchiver
       if collection.is_a? ActiveRecord::Base
         options[[collection]] = options[collection]
         options.delete(collection)
+      elsif !collection.present?
+        options.delete(collection)
       end
     end
     
-    models = options.each_pair.map do |collection, _|
+    models = options.keys.map do |collection|
       collection.first.class.base_class
     end
     
