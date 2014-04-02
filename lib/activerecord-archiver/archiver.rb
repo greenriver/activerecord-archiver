@@ -40,8 +40,12 @@ class ActiveRecordArchiver
   def self.insertable_hash model, hash
     ret = {}
     hash.each_pair do |key, value|
-      if column(model, key)
-        ret[column(model, key)] = value
+      if (col = column(model, key))
+        if col.type == :datetime and value.present?
+          ret[col] = DateTime.parse(value).to_s(:db)
+        else
+          ret[col] = value
+        end
       elsif belongs_to?(model, key)
         foreign_key = relation_foreign_key(model, key)
         if !hash.include?(foreign_key) and column_required(model, foreign_key)
