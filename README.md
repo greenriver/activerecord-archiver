@@ -21,7 +21,7 @@ Example:
   nodes[2].update_attribute :next_id, nodes[0].id
   
   # export
-  json = ActiveRecordArchiver.export Node => [nodes, [:name, :next]]
+  json = ActiveRecordArchiver.export(nodes)
   
   # json is '{"Node":[{"name":"a","next":1},{"name":"b","next":2},{"name":"c","next":0}]}'
 ```
