@@ -43,9 +43,8 @@ class ActiveRecordArchiver
     result = {}
     
     # serialize
-    @models_hash.each_pair do |model, pair|
-      records, attributes = pair
-      
+    @models_hash.each_pair do |model, (records, attributes)|
+      next unless records.present?
       result[model.to_s] = []
       records.each do |record|
         
