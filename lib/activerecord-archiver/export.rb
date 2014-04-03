@@ -44,7 +44,7 @@ class ActiveRecordArchiver
     
     # serialize
     @models_hash.each_pair do |model, (records, attributes)|
-      next unless records.present?
+      next unless records.compact.present?
       result[model.to_s] = []
       [*records].each do |record|
         
@@ -91,7 +91,7 @@ class ActiveRecordArchiver
       if collection.is_a? ActiveRecord::Base
         options[[collection]] = options[collection]
         options.delete(collection)
-      elsif !collection.present?
+      elsif !collection.compact.present?
         options.delete(collection)
       end
     end

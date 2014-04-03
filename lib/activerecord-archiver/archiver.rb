@@ -25,7 +25,7 @@ class ActiveRecordArchiver
   
   def self.relation_index record, attribute
     relevant_records = @models_hash[relation_model(record.class, attribute)].first
-    relevant_records.present? && relevant_records.map(&:id).index(record.send(attribute).id)
+    relevant_records.present? && relevant_records.compact.map(&:id).index(record.send(attribute).id)
   end
   
   def self.relation_id model, key, value
