@@ -119,4 +119,16 @@ class ActiveRecordArchiver
       end
     end.compact
   end
+  
+  def self.without_foreign_key_constraints
+    conn = ActiveRecord::Base.connection
+    if (conn.instance_of?(ActiveRecord::ConnectionAdapters::MysqlAdapter) or
+        conn.instance_of?(ActiveRecord::ConnectionAdapters::Mysql2Adapter))
+      conn.execute('SET foreign_key_checks = 0')
+      yield
+      conn.execute('SET foreign_key_checks = 1')
+    else
+      yield
+    end
+  end
 end

@@ -16,33 +16,33 @@ Effects:
 
 class ActiveRecordArchiver
   def self.import json
-    
     @data = JSON.parse json
     
     ActiveRecord::Base.transaction do
-      
-      # insert records
-      @data.each_pair do |model_name, records|
-        model = model_name.constantize
+      without_foreign_key_constraints do
         
-        assert_model model
-        
-        records.each do |record|
-          record[:id] = model.all.insert(insertable_hash(model, record))
+        # insert records
+        @data.each_pair do |model_name, records|
+          model = model_name.constantize
+          
+          assert_model model
+          
+          records.each do |record|
+            record[:id] = model.all.insert(insertable_hash(model, record))
+          end
         end
-      end
-      
-      # add relations
-      @data.each_pair do |model_name, records|
-        model = model_name.constantize
         
-        records.each do |record|
-          if (update_hash = relations_update_hash(model, record))
-            model.where(:id => record[:id]).update_all(update_hash)
+        # add relations
+        @data.each_pair do |model_name, records|
+          model = model_name.constantize
+          
+          records.each do |record|
+            if (update_hash = relations_update_hash(model, record))
+              model.where(:id => record[:id]).update_all(update_hash)
+            end
           end
         end
       end
-      
     end
     
     true
